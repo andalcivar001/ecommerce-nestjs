@@ -108,3 +108,9 @@ npm install --save @nestjs/jwt
 npm install --save @nestjs/jwt passport-jwt
 npm install --save-dev @types/passport-jwt
 npm i -D @types/multer.. para subir archivos en nestjs
+npm i @google-cloud/storage .. para que funcione el storage de google de firebase
+
+## Otros Recursos
+
+Se descargaron recursos de udemy (archivos async_foreach.js, cloud_storage.js) y se pegaron dentro de la carpeta utlis
+se descargo el archivo env.js y se pego dentro de la carpeta config.js
