@@ -15,15 +15,19 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtRolesGuard } from 'src/auth/jwt/jwt-roles.guard';
+import { HasRoles } from 'src/auth/jwt/has-roles';
+import { JwtRole } from 'src/auth/jwt/jwt-role';
 
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @HasRoles(JwtRole.ADMIN, JwtRole.CLIENT)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -34,13 +38,16 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @HasRoles(JwtRole.CLIENT)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @Put(':id')
   //ParseIntPipe convierte el parametro :id en number
   update(@Param('id', ParseIntPipe) id: number, @Body() user: UpdateUserDto) {
     return this.usersService.update(id, user);
   }
 
+  @HasRoles(JwtRole.CLIENT)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @Post('upload/:id')
   @UseInterceptors(FileInterceptor('file'))
   updateWithImage(

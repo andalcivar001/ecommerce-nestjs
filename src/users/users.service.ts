@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import uploadFile from '../utils/cloud_storage';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -16,7 +17,9 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({
+      relations: ['roles'],
+    });
   }
 
   async update(id: number, user: UpdateUserDto) {
@@ -62,6 +65,5 @@ export class UsersService {
     const updateUser = Object.assign(userFound, user);
     const res = await this.userRepository.save(updateUser);
     return res;
-    console.log('url ->', url);
   }
 }

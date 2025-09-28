@@ -1,15 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth-dto';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Rol } from 'src/roles/rol.entity';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Rol) private rolRepository: Repository<Rol>,
     private jwtService: JwtService,
   ) {}
 
@@ -29,9 +31,17 @@ export class AuthService {
       return new HttpException('El telefono ya existe', HttpStatus.CONFLICT);
     }
     const newUser = this.userRepository.create(user);
-    const userSaved = await this.userRepository.save(newUser);
+    const rolesIds = user.rolesIds;
+    const roles = await this.rolRepository.findBy({ id: In(rolesIds) });
+    newUser.roles = roles;
 
-    const payload = { id: userSaved.id, name: userSaved.name };
+    const userSaved = await this.userRepository.save(newUser);
+    const rolesIdsString = userSaved.roles.map((rol) => rol.id);
+    const payload = {
+      id: userSaved.id,
+      name: userSaved.name,
+      roles: rolesIdsString,
+    };
     const token = this.jwtService.sign(payload);
     const { password, ...userWithoutPassword } = userSaved;
 
@@ -45,8 +55,11 @@ export class AuthService {
   async login(loginData: LoginAuthDto) {
     const email = loginData.email;
     const pwd = loginData.password;
-    const userFound = await this.userRepository.findOneBy({
-      email,
+    const userFound = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+      relations: ['roles'], // aqui va el mismo campo que tiene en user.entity
     });
 
     if (!userFound) {
@@ -63,7 +76,9 @@ export class AuthService {
         HttpStatus.FORBIDDEN,
       );
     }
-    const payload = { id: userFound.id, name: userFound.name };
+
+    const rolesId = userFound.roles.map((rol) => rol.id);
+    const payload = { id: userFound.id, name: userFound.name, roles: rolesId };
     const token = this.jwtService.sign(payload);
     const { password, ...userWithoutPassword } = userFound;
     const data = {
