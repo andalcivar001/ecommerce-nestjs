@@ -25,7 +25,7 @@ export class UsersService {
   async update(id: number, user: UpdateUserDto) {
     const userFound = await this.userRepository.findOneBy({ id: id });
     if (!userFound) {
-      return new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
 
     if (user.phone != userFound.phone && user.phone) {
@@ -33,7 +33,7 @@ export class UsersService {
         phone: user.phone,
       });
       if (phoneFound) {
-        return new HttpException('Telefono ya existe', HttpStatus.CONFLICT);
+        throw new HttpException('Telefono ya existe', HttpStatus.CONFLICT);
       }
     }
 
@@ -50,7 +50,7 @@ export class UsersService {
     const url = await uploadFile(file, file.originalname);
 
     if (!url) {
-      return new HttpException(
+      throw new HttpException(
         'La imagen no se pudo guardar',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -59,7 +59,7 @@ export class UsersService {
     const userFound = await this.userRepository.findOneBy({ id: id });
 
     if (!userFound) {
-      return new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
     user.image = url;
     const updateUser = Object.assign(userFound, user);

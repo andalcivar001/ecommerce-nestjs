@@ -21,17 +21,18 @@ export class AuthService {
     });
     if (emailExists) {
       // El error 409 es un conflicto
-      return new HttpException('El email ya existe', HttpStatus.CONFLICT);
+      throw new HttpException('El email ya existe', HttpStatus.CONFLICT);
     }
 
     const phoneExists = await this.userRepository.findOneBy({
       phone: user.phone,
     });
     if (phoneExists) {
-      return new HttpException('El telefono ya existe', HttpStatus.CONFLICT);
+      throw new HttpException('El telefono ya existe', HttpStatus.CONFLICT);
     }
     const newUser = this.userRepository.create(user);
-    const rolesIds = user.rolesIds;
+    let rolesIds = user.rolesIds ? (user.rolesIds = user.rolesIds) : ['CLIENT'];
+
     const roles = await this.rolRepository.findBy({ id: In(rolesIds) });
     newUser.roles = roles;
 
@@ -63,7 +64,7 @@ export class AuthService {
     });
 
     if (!userFound) {
-      return new HttpException(
+      throw new HttpException(
         'El usuario no esta registrado',
         HttpStatus.NOT_FOUND,
       );
@@ -71,7 +72,7 @@ export class AuthService {
 
     const isPwdValid = await compare(pwd, userFound.password);
     if (!isPwdValid) {
-      return new HttpException(
+      throw new HttpException(
         'La contraseña es incorrecta',
         HttpStatus.FORBIDDEN,
       );
