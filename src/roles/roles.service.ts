@@ -16,7 +16,7 @@ export class RolesService {
       return await this.rolesRepository.save(newRol);
     } catch (error) {
       throw new InternalServerErrorException(
-        'No se pudo crear el rol ' + error.message,
+        `Error al crear el rol ${error.message}`,
       );
     }
   }
