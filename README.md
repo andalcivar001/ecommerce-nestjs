@@ -114,3 +114,8 @@ npm i @google-cloud/storage .. para que funcione el storage de google de firebas
 
 Se descargaron recursos de udemy (archivos async_foreach.js, cloud_storage.js) y se pegaron dentro de la carpeta utlis
 se descargo el archivo env.js y se pego dentro de la carpeta config.js
+
+//comandos
+nest g module "nombre_del_modulo" // crea el archivo module
+nest g service "nombre_del_servicio" // crea el archivo service
+nest g service "nombre_del_controlador" // crea el archivo controlador
