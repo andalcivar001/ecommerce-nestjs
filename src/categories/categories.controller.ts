@@ -24,6 +24,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtRole } from 'src/auth/jwt/jwt-role';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { JwtRolesGuard } from 'src/auth/jwt/jwt-roles.guard';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -40,7 +41,7 @@ export class CategoriesController {
   @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  updateWithImage(
+  createaWithImage(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -54,5 +55,43 @@ export class CategoriesController {
   ) {
     return this.categoriesService.create(file, category);
     console.log('file ->', file);
+  }
+
+  @HasRoles(JwtRole.ADMIN)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() category: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, category);
+  }
+
+  @HasRoles(JwtRole.ADMIN)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
+  @Put('upload/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  updateWithImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }), //maximo 10mb de peso el archivo
+          new FileTypeValidator({ fileType: '.(png|jpg|jpeg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() category: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.updateWithImage(file, id, category);
+    console.log('file ->', file);
+  }
+
+  @HasRoles(JwtRole.ADMIN)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
+  @Put(':id')
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.delete(id);
   }
 }

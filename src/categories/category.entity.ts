@@ -17,6 +17,9 @@ export class Category {
   @Column({ default: null })
   user_created: string;
 
+  @Column({ default: null })
+  user_modified: string;
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
