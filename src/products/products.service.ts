@@ -19,6 +19,14 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
   ) {}
 
+  findAll() {
+    return this.productsRepository.find();
+  }
+
+  findByCategory(id_category: number) {
+    return this.productsRepository.findBy({ id_category: id_category });
+  }
+
   async create(files: Array<Express.Multer.File>, product: CraeteProductDto) {
     if (files.length == 0) {
       throw new HttpException(

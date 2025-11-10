@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   FileTypeValidator,
+  Get,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -25,6 +26,20 @@ import { UpdateProductDto } from './dto/update-product-dto';
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
+
+  @HasRoles(JwtRole.ADMIN, JwtRole.CLIENT)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
+  @Get()
+  findAll() {
+    return this.productsService.findAll();
+  }
+
+  @HasRoles(JwtRole.ADMIN)
+  @UseGuards(JwtAuthGuard, JwtRolesGuard)
+  @Get('/category/:id_category')
+  findByCategory(@Param('id_category', ParseIntPipe) id_category: number) {
+    return this.productsService.findByCategory(id_category);
+  }
 
   @HasRoles(JwtRole.ADMIN)
   @UseGuards(JwtAuthGuard, JwtRolesGuard)
