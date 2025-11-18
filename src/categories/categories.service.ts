@@ -50,16 +50,19 @@ export class CategoriesService {
     }
     category.image = url;
     const updatedCategory = Object.assign(categoryFound, category);
-    return this.categoriesRepository.save(category);
+    return this.categoriesRepository.save(updatedCategory);
   }
 
   async update(id: number, category: UpdateCategoryDto) {
+    console.log('id', id);
+    console.log('category', category);
     const categoryFound = await this.categoriesRepository.findOneBy({ id: id });
     if (!categoryFound) {
       throw new HttpException('La categoria no existe', HttpStatus.NOT_FOUND);
     }
+    category.image = categoryFound.image;
     const updatedCategory = Object.assign(categoryFound, category);
-    return this.categoriesRepository.save(category);
+    return this.categoriesRepository.save(updatedCategory);
   }
 
   async delete(id: number) {

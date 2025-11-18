@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
@@ -85,12 +86,11 @@ export class CategoriesController {
     @Body() category: UpdateCategoryDto,
   ) {
     return this.categoriesService.updateWithImage(file, id, category);
-    console.log('file ->', file);
   }
 
   @HasRoles(JwtRole.ADMIN)
   @UseGuards(JwtAuthGuard, JwtRolesGuard)
-  @Put(':id')
+  @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.categoriesService.delete(id);
   }

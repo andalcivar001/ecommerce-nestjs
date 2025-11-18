@@ -71,7 +71,8 @@ export class ProductsService {
       );
     }
     let counter = 0;
-    let uploadFiles = Number(product.image_to_update![counter]); // contar cuantos archivos se han subido a firebase
+    let iamgeToUpdate = JSON.parse(product.image_to_update!);
+    let uploadFiles = iamgeToUpdate[counter]; // contar cuantos archivos se han subido a firebase
     const updateProduct = await this.update(id, product);
 
     const startForEach = async () => {
@@ -113,6 +114,7 @@ export class ProductsService {
   }
 
   async delete(id: number) {
+    console.log('id DELETE', id);
     try {
       const productFound = await this.productsRepository.findOneBy({ id: id });
       if (!productFound) {
